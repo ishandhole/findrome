@@ -1,0 +1,7 @@
+node_modules/
+data/*.db
+data/*.xlsx
+uploads/*
+!uploads/.gitkeep
+.env
+.DS_Store

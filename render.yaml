@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: findrome-recruitment
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: ADMIN_PASSWORD
+        value: findrome2026
+      - key: JWT_SECRET
+        generateValue: true
