@@ -348,16 +348,28 @@
     background: var(--bg-upload);
     color: var(--text-primary);
     font-weight: 700;
-    padding: 14px 16px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border-main);
     white-space: nowrap;
+    letter-spacing: 0.2px;
 }
 
 .submissions-table td {
-    padding: 14px 16px;
+    padding: 18px 20px;
     border-bottom: 1px solid var(--border-preference);
     color: var(--text-body);
-    vertical-align: top;
+    vertical-align: middle;
+}
+
+.submissions-table th:first-child,
+.submissions-table td:first-child {
+    padding-left: 24px;
+    width: 60px;
+}
+
+.submissions-table th:last-child,
+.submissions-table td:last-child {
+    padding-right: 24px;
 }
 
 .submissions-table tbody tr:hover {
@@ -368,56 +380,10 @@
     font-weight: 700;
     color: var(--text-primary);
     font-size: 14px;
-    margin-bottom: 2px;
+    letter-spacing: -0.1px;
 }
 
-.candidate-referral {
-    font-size: 11px;
-    color: var(--text-muted);
-}
 
-.pref-badge {
-    display: inline-block;
-    font-size: 11px;
-    padding: 2px 7px;
-    border-radius: 3px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-input);
-    margin-bottom: 3px;
-}
-
-.pref-badge.primary {
-    border-color: var(--green);
-    color: var(--green-dark);
-    font-weight: 700;
-}
-
-[data-theme="dark"] .pref-badge.primary {
-    color: var(--green);
-}
-
-.sop-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    color: var(--green-dark);
-    text-decoration: none;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 4px;
-    background: var(--green-glow);
-    border: 1px solid var(--green);
-    transition: all 0.2s ease;
-}
-
-[data-theme="dark"] .sop-link {
-    color: var(--green);
-}
-
-.sop-link:hover {
-    background: var(--green);
-    color: #07140f;
-}
 
 .table-loading,
 .table-empty {

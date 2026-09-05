@@ -85,35 +85,9 @@ const excelColumns = [
     { header: "Phone", key: "phone", width: 16 },
     { header: "SAP ID", key: "sap_id", width: 16 },
     { header: "Program", key: "program", width: 16 },
-    { header: "Branch", key: "branch", width: 22 },
-    { header: "Year", key: "year_of_study", width: 10 },
-    { header: "Position", key: "position", width: 20 },
-    { header: "1st Preference", key: "first_preference", width: 24 },
-    { header: "2nd Preference", key: "second_preference", width: 24 },
-    { header: "3rd Preference", key: "third_preference", width: 24 },
-    { header: "Past Findrome Exp.", key: "previous_findrome", width: 18 },
-    { header: "Referral", key: "referral", width: 20 },
-    { header: "SOP Document", key: "sop_original_name", width: 26 },
-    { header: "Saved File", key: "sop_filename", width: 30 }
+    { header: "Branch", key: "branch", width: 26 },
+    { header: "Year", key: "year_of_study", width: 10 }
 ];
-
-function formatDeptName(val) {
-    if (!val) return "";
-    const map = {
-        "digital-media-content": "Digital Media & Content",
-        "business-development": "Business Development",
-        "finance": "Finance",
-        "technical": "Technical",
-        "public-relations": "Public Relations",
-        "logistics": "Logistics",
-        "photography": "Photography",
-        "in-house-creatives": "In-House Creatives",
-        "editorial": "Editorial",
-        "executive": "Executive",
-        "senior-executive": "Senior Executive"
-    };
-    return map[val] || val;
-}
 
 // Generate full Excel spreadsheet from SQLite data
 function createExcelFromDatabase() {
@@ -122,7 +96,7 @@ function createExcelFromDatabase() {
             if (err) return reject(err);
 
             const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet("Recruitment 2026", {
+            const worksheet = workbook.addWorksheet("Event Registrations 2026", {
                 views: [{ state: "frozen", xSplit: 0, ySplit: 1 }]
             });
 
@@ -148,15 +122,7 @@ function createExcelFromDatabase() {
                     sap_id: r.sap_id,
                     program: r.program,
                     branch: r.branch,
-                    year_of_study: r.year_of_study,
-                    position: formatDeptName(r.position),
-                    first_preference: formatDeptName(r.first_preference),
-                    second_preference: formatDeptName(r.second_preference),
-                    third_preference: formatDeptName(r.third_preference),
-                    previous_findrome: r.previous_findrome ? r.previous_findrome.toUpperCase() : "NO",
-                    referral: r.referral || "N/A",
-                    sop_original_name: r.sop_original_name || "N/A",
-                    sop_filename: r.sop_filename || "N/A"
+                    year_of_study: r.year_of_study
                 });
 
                 row.height = 20;
@@ -182,13 +148,11 @@ function createExcelFromDatabase() {
 app.post("/api/submit", upload.single("sop"), (req, res) => {
     const {
         fullName, email, phone, sapId,
-        program, branch, yearOfStudy, position,
-        firstPreference, secondPreference, thirdPreference,
-        previousFindrome, referral
+        program, branch, yearOfStudy
     } = req.body;
 
     // Validate required fields
-    if (!fullName || !email || !phone || !sapId || !program || !branch || !yearOfStudy || !position || !firstPreference || !secondPreference || !thirdPreference || !previousFindrome) {
+    if (!fullName || !email || !phone || !sapId || !program || !branch || !yearOfStudy) {
         return res.status(400).json({ success: false, message: "Please fill in all required fields." });
     }
 
@@ -212,9 +176,12 @@ app.post("/api/submit", upload.single("sop"), (req, res) => {
 
     db.run(sql, [
         submittedAt, fullName.trim(), email.trim().toLowerCase(), phone.trim(), sapId.trim(),
-        program, branch.trim(), yearOfStudy, position,
-        firstPreference, secondPreference, thirdPreference,
-        previousFindrome, referral ? referral.trim() : "",
+        program, branch.trim(), yearOfStudy, req.body.position ? req.body.position.trim() : "",
+        req.body.firstPreference ? req.body.firstPreference.trim() : "",
+        req.body.secondPreference ? req.body.secondPreference.trim() : "",
+        req.body.thirdPreference ? req.body.thirdPreference.trim() : "",
+        req.body.previousFindrome ? req.body.previousFindrome.trim() : "no",
+        req.body.referral ? req.body.referral.trim() : "",
         sopFilename, sopOriginalName
     ], async function (err) {
         if (err) {
@@ -227,7 +194,7 @@ app.post("/api/submit", upload.single("sop"), (req, res) => {
 
         res.json({
             success: true,
-            message: "Your application has been successfully submitted! Our team will review your application soon.",
+            message: "Your event registration has been successfully submitted!",
             submissionId: this.lastID
         });
     });
@@ -299,7 +266,7 @@ app.get("/api/admin/stats", requireAdmin, (req, res) => {
 app.get("/api/admin/download-excel", requireAdmin, async (req, res) => {
     try {
         await createExcelFromDatabase();
-        const downloadName = `Findrome_Recruitment_Submissions_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        const downloadName = `Findrome_Event_Registrations_${new Date().toISOString().slice(0, 10)}.xlsx`;
         res.download(excelPath, downloadName);
     } catch (err) {
         res.status(500).json({ success: false, message: "Failed to export Excel file." });

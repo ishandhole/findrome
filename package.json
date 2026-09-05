@@ -1,7 +1,7 @@
 {
-  "name": "findrome-recruitment-portal",
+  "name": "findrome-event-registration",
   "version": "1.0.0",
-  "description": "Findrome Recruitment Portal with Excel and Database Backend",
+  "description": "Findrome Event Registration Portal with Excel and Database Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

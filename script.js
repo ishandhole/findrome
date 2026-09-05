@@ -27,11 +27,6 @@ const closeModalBtn = document.getElementById("closeModalBtn");
 const successId = document.getElementById("successId");
 const successMessage = document.getElementById("successMessage");
 
-const preferences = [
-    document.getElementById("firstPreference"),
-    document.getElementById("secondPreference"),
-    document.getElementById("thirdPreference")
-].filter(Boolean);
 
 // 3. Error Handling Helpers
 function showError(element, message) {
@@ -72,33 +67,6 @@ if (email) {
     });
 }
 
-// Prevent selecting duplicate department preferences
-function syncPreferences() {
-    const selected = preferences.map(s => s.value);
-    preferences.forEach(select => {
-        Array.from(select.options).forEach(opt => {
-            if (!opt.value) return;
-            opt.disabled = selected.includes(opt.value) && opt.value !== select.value;
-        });
-    });
-}
-
-preferences.forEach(select => {
-    select.addEventListener("change", () => {
-        clearError(select);
-        syncPreferences();
-    });
-});
-
-if (sop) {
-    sop.addEventListener("change", () => {
-        clearError(sop);
-        if (sop.files.length && !sop.files[0].name.toLowerCase().endsWith(".pdf")) {
-            showError(sop, "Please upload your SOP in PDF format only.");
-            sop.value = "";
-        }
-    });
-}
 
 // 5. Form Validation
 function validateForm() {
@@ -114,22 +82,6 @@ function validateForm() {
         }
     });
 
-    // Check radio group
-    const radioChecked = form.querySelector('input[name="previousFindrome"]:checked');
-    const radioBox = form.querySelector(".radio-group");
-    const radioErr = radioBox.querySelector(".field-error");
-    if (!radioChecked) {
-        if (!radioErr) {
-            const err = document.createElement("span");
-            err.className = "field-error";
-            err.textContent = "Please select an option.";
-            radioBox.appendChild(err);
-        }
-        isValid = false;
-    } else if (radioErr) {
-        radioErr.remove();
-    }
-
     // Validate email, phone, sapId
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
         showError(email, "Please enter a valid email address.");
@@ -144,12 +96,6 @@ function validateForm() {
         isValid = false;
     }
 
-    // Validate 3 distinct preferences
-    const prefValues = preferences.map(s => s.value);
-    if (prefValues.includes("") || new Set(prefValues).size !== prefValues.length) {
-        showError(preferences[preferences.length - 1], "Please select 3 different department preferences.");
-        isValid = false;
-    }
 
     return isValid;
 }
@@ -177,7 +123,7 @@ if (form) {
         const formData = new FormData(form);
         const originalText = submitButton.innerHTML;
         submitButton.disabled = true;
-        submitButton.innerHTML = "Submitting Application...";
+        submitButton.innerHTML = "Submitting Registration...";
 
         try {
             const response = await fetch("/api/submit", {
@@ -195,7 +141,6 @@ if (form) {
 
                 // Reset form
                 form.reset();
-                preferences.forEach(s => Array.from(s.options).forEach(o => o.disabled = false));
                 window.scrollTo({ top: 0, behavior: "smooth" });
             } else {
                 alert(result.message || "Failed to submit. Please try again.");

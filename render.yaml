@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: findrome-recruitment
+    name: findrome-event-registration
     env: node
     plan: free
     buildCommand: npm install

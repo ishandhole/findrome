@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Findrome Admin | Recruitment Submissions</title>
+    <title>Findrome Admin | Event Registration Submissions</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="admin.css">
     <script>
@@ -218,7 +218,7 @@
                 <div class="login-header">
                     <span class="lock-icon">🔒</span>
                     <h2>Admin Access</h2>
-                    <p>Enter the administrator password to access recruitment submissions and Excel export.</p>
+                    <p>Enter the administrator password to access event registration submissions and Excel export.</p>
                 </div>
                 <form id="adminLoginForm">
                     <div class="form-group">
@@ -246,9 +246,9 @@
             <!-- Stats Metrics -->
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <span class="metric-label">Total Applications</span>
+                    <span class="metric-label">Total Registrations</span>
                     <span class="metric-val" id="statTotal">0</span>
-                    <span class="metric-desc">Registered candidates</span>
+                    <span class="metric-desc">Registered participants</span>
                 </div>
             </div>
 
@@ -259,23 +259,10 @@
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
-                    <input type="text" id="searchInput" placeholder="Search by name, SAP ID, email, or dept...">
+                    <input type="text" id="searchInput" placeholder="Search by name, SAP ID, email, or branch...">
                 </div>
 
                 <div class="toolbar-filters">
-                    <select id="filterDept">
-                        <option value="">All Departments</option>
-                        <option value="digital-media-content">Digital Media & Content</option>
-                        <option value="business-development">Business Development</option>
-                        <option value="finance">Finance</option>
-                        <option value="technical">Technical</option>
-                        <option value="public-relations">Public Relations</option>
-                        <option value="logistics">Logistics</option>
-                        <option value="photography">Photography</option>
-                        <option value="in-house-creatives">In-House Creatives</option>
-                        <option value="editorial">Editorial</option>
-                    </select>
-
                     <select id="filterProgram">
                         <option value="">All Programs</option>
                         <option value="MBATECH">MBA Tech</option>
@@ -305,14 +292,12 @@
                             <th>Contact</th>
                             <th>SAP ID</th>
                             <th>Degree & Year</th>
-                            <th>Position & Preferences</th>
-                            <th>Past Exp.</th>
-                            <th>SOP</th>
+                            <th>Branch</th>
                         </tr>
                     </thead>
                     <tbody id="submissionsTableBody">
                         <tr>
-                            <td colspan="9" class="table-loading">Loading submissions...</td>
+                            <td colspan="7" class="table-loading">Loading registrations...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -321,7 +306,7 @@
             <!-- Bottom Table Actions / Footer -->
             <div class="admin-table-footer">
                 <div class="footer-info">
-                    <span>Showing <strong id="visibleCount">0</strong> applications</span>
+                    <span>Showing <strong id="visibleCount">0</strong> registrations</span>
                 </div>
                 <button type="button" id="clearAllBtn" class="admin-btn-danger" title="Clear all test entries and reset Excel file">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">

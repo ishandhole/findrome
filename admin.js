@@ -13,7 +13,6 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const submissionsTableBody = document.getElementById("submissionsTableBody");
 const searchInput = document.getElementById("searchInput");
-const filterDept = document.getElementById("filterDept");
 const filterProgram = document.getElementById("filterProgram");
 const downloadExcelBtn = document.getElementById("downloadExcelBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
@@ -114,24 +113,6 @@ if (adminLoginForm) {
 if (logoutBtn) logoutBtn.addEventListener("click", logout);
 
 // 4. Data Formatting Helper
-function formatDept(val) {
-    if (!val) return "-";
-    const map = {
-        "digital-media-content": "Digital Media & Content",
-        "business-development": "Business Development",
-        "finance": "Finance",
-        "technical": "Technical",
-        "public-relations": "Public Relations",
-        "logistics": "Logistics",
-        "photography": "Photography",
-        "in-house-creatives": "In-House Creatives",
-        "editorial": "Editorial",
-        "executive": "Executive",
-        "senior-executive": "Senior Executive"
-    };
-    return map[val] || val;
-}
-
 function escapeHtml(str) {
     if (!str) return "";
     return String(str).replace(/[&<>"']/g, m => ({
@@ -142,7 +123,7 @@ function escapeHtml(str) {
 // 5. Load & Render Submissions
 async function loadDashboardData() {
     try {
-        submissionsTableBody.innerHTML = `<tr><td colspan="9" class="table-loading">Loading submissions...</td></tr>`;
+        submissionsTableBody.innerHTML = `<tr><td colspan="7" class="table-loading">Loading registrations...</td></tr>`;
 
         const [subRes, statsRes] = await Promise.all([
             fetch("/api/admin/submissions", { headers: { "Authorization": `Bearer ${authToken}` } }),
@@ -164,47 +145,41 @@ async function loadDashboardData() {
 
         renderTable();
     } catch (err) {
-        submissionsTableBody.innerHTML = `<tr><td colspan="9" class="table-empty">Error loading data: ${err.message}</td></tr>`;
+        submissionsTableBody.innerHTML = `<tr><td colspan="7" class="table-empty">Error loading data: ${err.message}</td></tr>`;
     }
 }
 
 function renderTable() {
-    const search = searchInput.value.toLowerCase().trim();
-    const dept = filterDept.value;
-    const prog = filterProgram.value;
+    const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const prog = filterProgram ? filterProgram.value : "";
 
     const filtered = allSubmissions.filter(item => {
         const matchSearch = !search ||
             (item.full_name && item.full_name.toLowerCase().includes(search)) ||
             (item.email && item.email.toLowerCase().includes(search)) ||
             (item.phone && item.phone.includes(search)) ||
-            (item.sap_id && item.sap_id.includes(search));
+            (item.sap_id && item.sap_id.includes(search)) ||
+            (item.branch && item.branch.toLowerCase().includes(search));
 
-        const matchDept = !dept || [item.first_preference, item.second_preference, item.third_preference].includes(dept);
         const matchProg = !prog || item.program === prog;
 
-        return matchSearch && matchDept && matchProg;
+        return matchSearch && matchProg;
     });
 
     if (visibleCount) visibleCount.textContent = filtered.length;
 
     if (filtered.length === 0) {
-        submissionsTableBody.innerHTML = `<tr><td colspan="9" class="table-empty">No submissions found.</td></tr>`;
+        submissionsTableBody.innerHTML = `<tr><td colspan="7" class="table-empty">No registrations found.</td></tr>`;
         return;
     }
 
     submissionsTableBody.innerHTML = filtered.map(row => {
-        const sopLink = row.sop_filename
-            ? `<a href="/api/admin/sop/${encodeURIComponent(row.sop_filename)}" target="_blank" class="sop-link">📄 View SOP</a>`
-            : `<span style="color: var(--text-muted); font-size: 11px;">No File</span>`;
-
         return `
             <tr>
                 <td><strong>#${row.id}</strong></td>
                 <td style="white-space: nowrap; font-size: 12px;">${escapeHtml(row.submitted_at)}</td>
                 <td>
                     <div class="candidate-name">${escapeHtml(row.full_name)}</div>
-                    ${row.referral ? `<div class="candidate-referral">Ref: ${escapeHtml(row.referral)}</div>` : ""}
                 </td>
                 <td>
                     <div>${escapeHtml(row.email)}</div>
@@ -212,21 +187,12 @@ function renderTable() {
                 </td>
                 <td><code>${escapeHtml(row.sap_id)}</code></td>
                 <td>
-                    <strong>${escapeHtml(row.program)}</strong> - ${escapeHtml(row.branch)}
+                    <strong>${escapeHtml(row.program)}</strong>
                     <div style="color: var(--text-muted); font-size: 12px;">Year ${escapeHtml(row.year_of_study)}</div>
                 </td>
                 <td>
-                    <div style="font-weight: 700; margin-bottom: 4px;">${formatDept(row.position)}</div>
-                    <div><span class="pref-badge primary">1st: ${formatDept(row.first_preference)}</span></div>
-                    <div><span class="pref-badge">2nd: ${formatDept(row.second_preference)}</span></div>
-                    <div><span class="pref-badge">3rd: ${formatDept(row.third_preference)}</span></div>
+                    <span style="font-weight: 600;">${escapeHtml(row.branch)}</span>
                 </td>
-                <td>
-                    <span style="font-weight: 700; color: ${row.previous_findrome === 'yes' ? 'var(--green)' : 'var(--text-muted)'};">
-                        ${row.previous_findrome === 'yes' ? '✓ Yes' : 'No'}
-                    </span>
-                </td>
-                <td>${sopLink}</td>
             </tr>
         `;
     }).join("");
@@ -234,7 +200,6 @@ function renderTable() {
 
 // 6. Search & Filter Listeners
 if (searchInput) searchInput.addEventListener("input", renderTable);
-if (filterDept) filterDept.addEventListener("change", renderTable);
 if (filterProgram) filterProgram.addEventListener("change", renderTable);
 
 // 7. Download Excel
@@ -257,7 +222,7 @@ if (downloadExcelBtn) {
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `Findrome_Recruitment_Submissions_${new Date().toISOString().slice(0, 10)}.xlsx`;
+            a.download = `Findrome_Event_Registrations_${new Date().toISOString().slice(0, 10)}.xlsx`;
             document.body.appendChild(a);
             a.click();
             a.remove();

@@ -275,13 +275,13 @@ header {
 
 main {
     width: 100%;
-    max-width: 950px;
+    max-width: 860px;
     margin: 0 auto;
-    padding: 70px 40px 100px;
+    padding: 60px 36px 90px;
 }
 
 .form-intro {
-    margin-bottom: 65px;
+    margin-bottom: 52px;
 }
 
 .form-label {
@@ -297,10 +297,10 @@ main {
 }
 
 .form-intro h2 {
-    font-size: 52px;
+    font-size: 50px;
     line-height: 1.05;
     font-weight: 800;
-    letter-spacing: -2.5px;
+    letter-spacing: -2px;
     color: var(--text-primary);
     max-width: 700px;
     transition: color 0.3s ease;
@@ -309,13 +309,13 @@ main {
 .intro-line {
     width: 55px;
     height: 4px;
-    margin-top: 22px;
+    margin-top: 20px;
     background: var(--green);
 }
 
 .form-section {
-    padding: 0 0 50px;
-    margin-bottom: 50px;
+    padding: 0 0 44px;
+    margin-bottom: 44px;
     border-bottom: 1px solid var(--border-main);
     transition: border-color 0.3s ease;
 }
@@ -324,7 +324,7 @@ main {
     display: flex;
     align-items: baseline;
     gap: 16px;
-    margin-bottom: 30px;
+    margin-bottom: 26px;
 }
 
 .section-heading span {
@@ -349,7 +349,7 @@ main {
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 25px 35px;
+    gap: 24px 32px;
 }
 
 .full-width {
@@ -430,7 +430,7 @@ select option {
 }
 
 .preference-container {
-    margin-top: 30px;
+    margin-top: 12px;
     border-top: 1px solid var(--border-preference);
     transition: border-color 0.3s ease;
 }
@@ -439,7 +439,7 @@ select option {
     display: grid;
     grid-template-columns: 70px 1fr;
     align-items: center;
-    padding: 22px 0;
+    padding: 20px 0;
     border-bottom: 1px solid var(--border-preference);
     transition: border-color 0.3s ease;
 }
