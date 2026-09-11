@@ -1,6 +1,6 @@
 node_modules/
-data/*.db
-data/*.xlsx
+data/*
+!data/.gitkeep
 uploads/*
 !uploads/.gitkeep
 .env

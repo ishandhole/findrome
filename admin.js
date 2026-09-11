@@ -149,9 +149,16 @@ async function loadDashboardData() {
     }
 }
 
+const PROGRAM_LABELS = {
+    "MBATECH": "MBA Tech",
+    "BTECH": "B.Tech",
+    "BTI": "BTI",
+    "ASMSOC": "ASMSOC"
+};
+
 function renderTable() {
     const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    const prog = filterProgram ? filterProgram.value : "";
+    const prog = filterProgram ? filterProgram.value.trim().toUpperCase() : "";
 
     const filtered = allSubmissions.filter(item => {
         const matchSearch = !search ||
@@ -159,9 +166,11 @@ function renderTable() {
             (item.email && item.email.toLowerCase().includes(search)) ||
             (item.phone && item.phone.includes(search)) ||
             (item.sap_id && item.sap_id.includes(search)) ||
+            (item.program && item.program.toLowerCase().includes(search)) ||
             (item.branch && item.branch.toLowerCase().includes(search));
 
-        const matchProg = !prog || item.program === prog;
+        const itemProg = (item.program || "").trim().toUpperCase();
+        const matchProg = !prog || itemProg === prog;
 
         return matchSearch && matchProg;
     });
@@ -174,6 +183,7 @@ function renderTable() {
     }
 
     submissionsTableBody.innerHTML = filtered.map(row => {
+        const displayProg = PROGRAM_LABELS[row.program] || row.program;
         return `
             <tr>
                 <td><strong>#${row.id}</strong></td>
@@ -187,7 +197,7 @@ function renderTable() {
                 </td>
                 <td><code>${escapeHtml(row.sap_id)}</code></td>
                 <td>
-                    <strong>${escapeHtml(row.program)}</strong>
+                    <strong>${escapeHtml(displayProg)}</strong>
                     <div style="color: var(--text-muted); font-size: 12px;">Year ${escapeHtml(row.year_of_study)}</div>
                 </td>
                 <td>
