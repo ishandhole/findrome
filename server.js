@@ -60,6 +60,7 @@ db.run(`
         email TEXT NOT NULL,
         phone TEXT NOT NULL,
         sap_id TEXT NOT NULL,
+        college TEXT,
         program TEXT NOT NULL,
         branch TEXT NOT NULL,
         year_of_study TEXT NOT NULL,
@@ -74,6 +75,9 @@ db.run(`
     )
 `);
 
+// Add college column if missing in older database files
+db.run("ALTER TABLE submissions ADD COLUMN college TEXT", () => {});
+
 // -------------------------------------------------------------
 // 2. Excel Generation Helpers
 // -------------------------------------------------------------
@@ -84,6 +88,7 @@ const excelColumns = [
     { header: "Email Address", key: "email", width: 28 },
     { header: "Phone", key: "phone", width: 16 },
     { header: "SAP ID", key: "sap_id", width: 16 },
+    { header: "College", key: "college", width: 14 },
     { header: "Program", key: "program", width: 16 },
     { header: "Branch", key: "branch", width: 26 },
     { header: "Year", key: "year_of_study", width: 10 }
@@ -120,6 +125,7 @@ function createExcelFromDatabase() {
                     email: r.email,
                     phone: r.phone,
                     sap_id: r.sap_id,
+                    college: r.college || (r.program === "ASMSOC" ? "ASMSOC" : "MPSTME"),
                     program: r.program,
                     branch: r.branch,
                     year_of_study: r.year_of_study
@@ -148,11 +154,21 @@ function createExcelFromDatabase() {
 app.post("/api/submit", upload.single("sop"), (req, res) => {
     const {
         fullName, email, phone, sapId,
-        program, branch, yearOfStudy
+        college, program, branch, yearOfStudy
     } = req.body;
 
+    const resolvedCollege = (college || (program === "ASMSOC" ? "ASMSOC" : "MPSTME")).trim();
+    let resolvedProgram = program ? program.trim() : "";
+    let resolvedBranch = branch ? branch.trim() : "";
+
+    // For ASMSOC candidates, program defaults to ASMSOC and branch to Commerce
+    if (resolvedCollege === "ASMSOC") {
+        if (!resolvedProgram) resolvedProgram = "ASMSOC";
+        if (!resolvedBranch) resolvedBranch = "Commerce";
+    }
+
     // Validate required fields
-    if (!fullName || !email || !phone || !sapId || !program || !branch || !yearOfStudy) {
+    if (!fullName || !email || !phone || !sapId || !resolvedProgram || !resolvedBranch || !yearOfStudy) {
         return res.status(400).json({ success: false, message: "Please fill in all required fields." });
     }
 
@@ -168,15 +184,16 @@ app.post("/api/submit", upload.single("sop"), (req, res) => {
     const sql = `
         INSERT INTO submissions (
             submitted_at, full_name, email, phone, sap_id,
-            program, branch, year_of_study, position,
+            college, program, branch, year_of_study, position,
             first_preference, second_preference, third_preference,
             previous_findrome, referral, sop_filename, sop_original_name
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     db.run(sql, [
         submittedAt, fullName.trim(), email.trim().toLowerCase(), phone.trim(), sapId.trim(),
-        program, branch.trim(), yearOfStudy, req.body.position ? req.body.position.trim() : "",
+        resolvedCollege, resolvedProgram, resolvedBranch, yearOfStudy,
+        req.body.position ? req.body.position.trim() : "",
         req.body.firstPreference ? req.body.firstPreference.trim() : "",
         req.body.secondPreference ? req.body.secondPreference.trim() : "",
         req.body.thirdPreference ? req.body.thirdPreference.trim() : "",

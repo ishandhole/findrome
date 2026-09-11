@@ -22,13 +22,118 @@ const email = document.getElementById("email");
 const sop = document.getElementById("sop");
 const submitButton = form ? form.querySelector("button[type='submit']") : null;
 
+const collegeSelect = document.getElementById("college");
+const programGroup = document.getElementById("programGroup");
+const programSelect = document.getElementById("program");
+const yearGroup = document.getElementById("yearGroup");
+const yearSelect = document.getElementById("yearOfStudy");
+const yearOption5 = document.getElementById("yearOption5");
+const branchGroup = document.getElementById("branchGroup");
+const branchInput = document.getElementById("branch");
+
 const successModal = document.getElementById("successModal");
 const closeModalBtn = document.getElementById("closeModalBtn");
 const successId = document.getElementById("successId");
 const successMessage = document.getElementById("successMessage");
 
 
-// 3. Error Handling Helpers
+// 3. Dynamic Academic Fields Handler
+function updateAcademicFields() {
+    const selectedCollege = collegeSelect ? collegeSelect.value : "";
+
+    if (selectedCollege === "MPSTME") {
+        // MPSTME: Program, Year, and Branch are required
+        if (programGroup) programGroup.classList.remove("hidden");
+        if (programSelect) {
+            programSelect.required = true;
+            programSelect.disabled = false;
+        }
+
+        if (branchGroup) branchGroup.classList.remove("hidden");
+        if (branchInput) {
+            branchInput.required = true;
+            branchInput.disabled = false;
+            branchInput.placeholder = "Enter your branch (e.g. Computer Engineering)";
+        }
+
+        if (yearGroup) {
+            yearGroup.classList.remove("full-width");
+            yearGroup.classList.remove("hidden");
+        }
+        if (yearSelect) {
+            yearSelect.required = true;
+            yearSelect.disabled = false;
+        }
+        if (yearOption5) yearOption5.style.display = "";
+    } else if (selectedCollege === "ASMSOC") {
+        // ASMSOC: Only Year of Study is required. Program & Branch are hidden
+        if (programGroup) {
+            programGroup.classList.add("hidden");
+            if (programSelect) clearError(programSelect);
+        }
+        if (programSelect) {
+            programSelect.required = false;
+            programSelect.disabled = true;
+            programSelect.value = "";
+        }
+
+        if (branchGroup) {
+            branchGroup.classList.add("hidden");
+            if (branchInput) clearError(branchInput);
+        }
+        if (branchInput) {
+            branchInput.required = false;
+            branchInput.disabled = true;
+            branchInput.value = "";
+        }
+
+        if (yearGroup) {
+            yearGroup.classList.add("full-width");
+            yearGroup.classList.remove("hidden");
+        }
+        if (yearSelect) {
+            yearSelect.required = true;
+            yearSelect.disabled = false;
+        }
+        if (yearOption5) {
+            yearOption5.style.display = "none";
+            if (yearSelect && yearSelect.value === "5") yearSelect.value = "";
+        }
+    } else {
+        // Initial / Unselected: hide program, year, branch
+        if (programGroup) programGroup.classList.add("hidden");
+        if (programSelect) {
+            programSelect.required = false;
+            programSelect.disabled = true;
+            programSelect.value = "";
+        }
+
+        if (branchGroup) branchGroup.classList.add("hidden");
+        if (branchInput) {
+            branchInput.required = false;
+            branchInput.disabled = true;
+            branchInput.value = "";
+        }
+
+        if (yearGroup) yearGroup.classList.add("hidden");
+        if (yearSelect) {
+            yearSelect.required = false;
+            yearSelect.disabled = true;
+            yearSelect.value = "";
+        }
+    }
+}
+
+if (collegeSelect) {
+    collegeSelect.addEventListener("change", () => {
+        clearError(collegeSelect);
+        updateAcademicFields();
+    });
+    updateAcademicFields();
+}
+
+
+// 4. Error Handling Helpers
 function showError(element, message) {
     let error = element.parentElement.querySelector(".field-error");
     if (!error) {
@@ -41,12 +146,13 @@ function showError(element, message) {
 }
 
 function clearError(element) {
+    if (!element) return;
     const error = element.parentElement.querySelector(".field-error");
     if (error) error.textContent = "";
     element.classList.remove("input-error");
 }
 
-// 4. Live Input Formatting & Validation
+// 5. Live Input Formatting & Validation
 if (phone) {
     phone.addEventListener("input", () => {
         phone.value = phone.value.replace(/\D/g, "").slice(0, 10);
@@ -68,12 +174,13 @@ if (email) {
 }
 
 
-// 5. Form Validation
+// 6. Form Validation
 function validateForm() {
     let isValid = true;
 
-    // Check required inputs
+    // Check required inputs (skipping disabled or hidden fields)
     form.querySelectorAll("[required]").forEach(field => {
+        if (field.disabled || field.closest(".hidden")) return;
         clearError(field);
         if (field.type === "radio") return;
         if (!field.value.trim()) {
@@ -96,11 +203,10 @@ function validateForm() {
         isValid = false;
     }
 
-
     return isValid;
 }
 
-// 6. Form Submission
+// 7. Form Submission
 if (closeModalBtn) {
     closeModalBtn.addEventListener("click", () => {
         if (successModal) successModal.classList.add("hidden");
@@ -121,6 +227,17 @@ if (form) {
         }
 
         const formData = new FormData(form);
+        const selectedCollege = collegeSelect ? collegeSelect.value : "";
+
+        // Guarantee fallback values for ASMSOC when program/branch fields are hidden
+        if (selectedCollege === "ASMSOC") {
+            formData.set("college", "ASMSOC");
+            formData.set("program", "ASMSOC");
+            formData.set("branch", "Commerce");
+        } else {
+            formData.set("college", selectedCollege || "MPSTME");
+        }
+
         const originalText = submitButton.innerHTML;
         submitButton.disabled = true;
         submitButton.innerHTML = "Submitting Registration...";
@@ -141,6 +258,7 @@ if (form) {
 
                 // Reset form
                 form.reset();
+                updateAcademicFields();
                 window.scrollTo({ top: 0, behavior: "smooth" });
             } else {
                 alert(result.message || "Failed to submit. Please try again.");

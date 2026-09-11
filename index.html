@@ -289,9 +289,27 @@
 
                 <div class="form-grid">
 
-                    <div class="form-group">
-                        <label for="program">Program / Degree</label>
+                    <div class="form-group full-width" id="collegeGroup">
+                        <label for="college">School / College</label>
+                        <select
+                            id="college"
+                            name="college"
+                            required
+                        >
+                            <option value="" disabled selected>
+                                Select your college / school
+                            </option>
+                            <option value="MPSTME">
+                                MPSTME (Mukesh Patel School of Technology Management & Engineering)
+                            </option>
+                            <option value="ASMSOC">
+                                ASMSOC (Anil Surendra Modi School of Commerce)
+                            </option>
+                        </select>
+                    </div>
 
+                    <div class="form-group" id="programGroup">
+                        <label for="program">Program / Degree</label>
                         <select
                             id="program"
                             name="program"
@@ -300,28 +318,20 @@
                             <option value="" disabled selected>
                                 Select your program
                             </option>
-
                             <option value="MBATECH">
                                 MBA Tech
                             </option>
-
                             <option value="BTECH">
                                 B.Tech
                             </option>
-
                             <option value="BTI">
                                 BTI
-                            </option>
-
-                            <option value="ASMSOC">
-                                ASMSOC
                             </option>
                         </select>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="yearGroup">
                         <label for="yearOfStudy">Year of Study</label>
-
                         <select
                             id="yearOfStudy"
                             name="yearOfStudy"
@@ -330,18 +340,16 @@
                             <option value="" disabled selected>
                                 Select your year
                             </option>
-
                             <option value="1">1st Year</option>
                             <option value="2">2nd Year</option>
                             <option value="3">3rd Year</option>
                             <option value="4">4th Year</option>
-                            <option value="5">5th Year</option>
+                            <option value="5" id="yearOption5">5th Year</option>
                         </select>
                     </div>
 
-                    <div class="form-group full-width">
+                    <div class="form-group full-width" id="branchGroup">
                         <label for="branch">Branch</label>
-
                         <input
                             type="text"
                             id="branch"

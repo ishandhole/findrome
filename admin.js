@@ -13,6 +13,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const submissionsTableBody = document.getElementById("submissionsTableBody");
 const searchInput = document.getElementById("searchInput");
+const filterCollege = document.getElementById("filterCollege");
 const filterProgram = document.getElementById("filterProgram");
 const downloadExcelBtn = document.getElementById("downloadExcelBtn");
 const clearAllBtn = document.getElementById("clearAllBtn");
@@ -158,21 +159,26 @@ const PROGRAM_LABELS = {
 
 function renderTable() {
     const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
+    const col = filterCollege ? filterCollege.value.trim().toUpperCase() : "";
     const prog = filterProgram ? filterProgram.value.trim().toUpperCase() : "";
 
     const filtered = allSubmissions.filter(item => {
+        const itemCollege = (item.college || (item.program === "ASMSOC" ? "ASMSOC" : "MPSTME")).trim().toUpperCase();
+        const itemProg = (item.program || "").trim().toUpperCase();
+
         const matchSearch = !search ||
             (item.full_name && item.full_name.toLowerCase().includes(search)) ||
             (item.email && item.email.toLowerCase().includes(search)) ||
             (item.phone && item.phone.includes(search)) ||
             (item.sap_id && item.sap_id.includes(search)) ||
-            (item.program && item.program.toLowerCase().includes(search)) ||
+            itemCollege.toLowerCase().includes(search) ||
+            itemProg.toLowerCase().includes(search) ||
             (item.branch && item.branch.toLowerCase().includes(search));
 
-        const itemProg = (item.program || "").trim().toUpperCase();
+        const matchCollege = !col || itemCollege === col;
         const matchProg = !prog || itemProg === prog;
 
-        return matchSearch && matchProg;
+        return matchSearch && matchCollege && matchProg;
     });
 
     if (visibleCount) visibleCount.textContent = filtered.length;
@@ -183,7 +189,14 @@ function renderTable() {
     }
 
     submissionsTableBody.innerHTML = filtered.map(row => {
+        const itemCollege = (row.college || (row.program === "ASMSOC" ? "ASMSOC" : "MPSTME")).trim().toUpperCase();
         const displayProg = PROGRAM_LABELS[row.program] || row.program;
+        const isAsmsoc = itemCollege === "ASMSOC";
+
+        const branchContent = isAsmsoc && (!row.branch || row.branch.toLowerCase() === "commerce" || row.branch.toLowerCase() === "n/a")
+            ? `<span style="color: var(--text-muted); font-style: italic; font-size: 12px;">Commerce (N/A)</span>`
+            : `<span style="font-weight: 600;">${escapeHtml(row.branch)}</span>`;
+
         return `
             <tr>
                 <td><strong>#${row.id}</strong></td>
@@ -197,11 +210,12 @@ function renderTable() {
                 </td>
                 <td><code>${escapeHtml(row.sap_id)}</code></td>
                 <td>
-                    <strong>${escapeHtml(displayProg)}</strong>
+                    <span class="college-badge ${isAsmsoc ? 'badge-asmsoc' : 'badge-mpstme'}">${escapeHtml(itemCollege)}</span>
+                    <div><strong>${escapeHtml(displayProg)}</strong></div>
                     <div style="color: var(--text-muted); font-size: 12px;">Year ${escapeHtml(row.year_of_study)}</div>
                 </td>
                 <td>
-                    <span style="font-weight: 600;">${escapeHtml(row.branch)}</span>
+                    ${branchContent}
                 </td>
             </tr>
         `;
@@ -210,6 +224,7 @@ function renderTable() {
 
 // 6. Search & Filter Listeners
 if (searchInput) searchInput.addEventListener("input", renderTable);
+if (filterCollege) filterCollege.addEventListener("change", renderTable);
 if (filterProgram) filterProgram.addEventListener("change", renderTable);
 
 // 7. Download Excel

@@ -438,6 +438,42 @@
     transform: translateY(-1px);
 }
 
+/* College Badge Pills */
+.college-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.badge-mpstme {
+    background: rgba(14, 170, 114, 0.12);
+    color: #0b8a5b;
+    border: 1px solid rgba(14, 170, 114, 0.25);
+}
+
+[data-theme="dark"] .badge-mpstme {
+    background: rgba(14, 170, 114, 0.2);
+    color: var(--green);
+    border-color: rgba(14, 170, 114, 0.35);
+}
+
+.badge-asmsoc {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+[data-theme="dark"] .badge-asmsoc {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
 @media (max-width: 900px) {
     .admin-main {
         padding: 25px 20px 60px;
